@@ -18,7 +18,7 @@ thickness = 3;
 wall = 4;
 radius=4;
 
-angle=7;
+angle=0;
 
 height=10+thickness*2; // min 12 to not have pins bottom out
 
@@ -27,15 +27,19 @@ height=10+thickness*2; // min 12 to not have pins bottom out
 // from key locations
 
 width = 3;
-length= 3;
+length= 8;
 
 border = 8;
 
 ml=33 ; // microcontroller dimensions
 mw=18 ;
 
-
-points = [for (k=[0:width-1]) for (l = [0:length-1]) concat(l,k), [1.5,width],[3.5,width] ];
+// you shouldn't have to include stabilized keys in this list, but I did here
+points = [
+	for (k=[0:width-1]) for (l = [0:length-1]) concat(l,k),
+	//[0.5,width],
+	//[2.5,width] 
+	];
 
 //method: use python to build points vector from key spacings from KLE website
 
@@ -43,7 +47,7 @@ points = [for (k=[0:width-1]) for (l = [0:length-1]) concat(l,k), [1.5,width],[3
 // points = [[1, 1.25], [1, 3.25], [1, 4.25], [1, 5.25], [1, 6.25], [1, 7.25], [1, 8.25], [1, 9.25], [1, 10.25], [1, 11.25], [1, 12.25], [1, 13.25], [1, 14.25], [1, 15.5], [2, 1.25], [2, 2.25], [2, 3.25], [2, 4.25], [2, 5.25], [2, 6.25], [2, 7.25], [2, 8.25], [2, 9.25], [2, 10.25], [2, 11.25], [2, 12.25], [2, 13.25], [2, 14.25], [2, 16.25]];
 
 // which keys are stabilized keys (2u)
-stabs = [[1.5,width],[3.5,width]];
+stabs = [[0.5,width],[2.5,width]];
 
 //which key is spacebar
 spacebar = [];
@@ -56,7 +60,7 @@ holes=[];
 
 //platesize= (max(points)+min(points)+[1,1]) * unit + border * [1,1];
 
-platesize = unit*[length,width] + unit*[2,2];
+platesize = unit*[length,width] + 0.5*unit*[1,3];
 
 //plate with mounting holes
 module plate(size,p,st,sp,h,b,t,ss,flag=0){    
@@ -69,8 +73,9 @@ module plate(size,p,st,sp,h,b,t,ss,flag=0){
 
 				for (i=st){ // cutouts for 2u stabilizers
 					translate(unit*(i+0.5*[1,1])) {
+						square(ss,true);
 						for (ii = [-1,1]){
-							translate([ii*11.9,0.62]) {
+							translate([ii*11.9,0.22]) {
 								square([6.65,12.3],true);
 								translate([0,-0.6]) square([3,13.5],true);
 								translate([0,0.9]) square([8.4,2.8],true);
@@ -88,7 +93,7 @@ module plate(size,p,st,sp,h,b,t,ss,flag=0){
 
 
 			} // end of holes in slab
-			// mark the [1,1] key corner with a cylinder
+			  // mark the [1,1] key corner with a cylinder
 			if (flag) translate( - 0.5*size )
 				color("red") cylinder (5,2,2); 
 
@@ -192,15 +197,16 @@ module base(size,ht,ang){
 	rotate([angle,0,0]) 
 translate([0,radius+platesize[1]/2,radius]) 
 	case(platesize,points,holes,height,radius, wall,border,thickness); 
-translate([0,platesize[1]/2+2,1]) 
-	base(platesize, height,angle);
+	if (angle){
+		translate([0,platesize[1]/2+2,1]) 
+#	base(platesize, height,angle);
+	}
+translate([-platesize[1]*2,0,0]) plate(platesize,points,stabs,spacebar,[],border,thickness,switchsize);
 
-	translate([-platesize[1]*2,0,0]) plate(platesize,points,stabs,spacebar,[],border,thickness,switchsize);
 
 
-
-	//1.00u = 0.7500in || 19.0500mm
-	//1.25u = 0.9375in || 23.8125mm
-	//1.50u = 1.1250in || 28.5750mm
-	//1.75u = 1.3125in || 33.3375mm
-	//2.00u = 1.5000in || 38.1000mm
+//1.00u = 0.7500in || 19.0500mm
+//1.25u = 0.9375in || 23.8125mm
+//1.50u = 1.1250in || 28.5750mm
+//1.75u = 1.3125in || 33.3375mm
+//2.00u = 1.5000in || 38.1000mm
