@@ -26,7 +26,7 @@ platesize = UNIT*[length,width] + border*[1,1];
 // origin placed at low-left, in from the edge by 1/2 border
 origin = -0.5*(platesize) + 0.5*border*[1,1];
 
-module plate_proj(size,coords,start,sw_dim,flag=0){    
+module plate_proj(size,coords,start,sw_dim){    
 	difference()
 	{
 		square(size,true);
@@ -39,17 +39,14 @@ module plate_proj(size,coords,start,sw_dim,flag=0){
 		// when implementing holes for stabs and fixation, put it here
 
 	}	// end of holes in slab
-		// mark the [1,1] key corner with a cylinder
-	if (flag) translate( - 0.5*size )
-		color("red") cylinder (5,2,2); 
 
 }	
 
-module plate(size,coords,start,small=14,big = 15.6,th=5,lip=1.5){
+module plate(size,coords=[],start=[0,0],small=14,big = 15.6,th=5,lip=1.5){
 	linear_extrude(th - lip) plate_proj(size,coords,start,big);
 	translate([0,0,th-lip]) 
 		linear_extrude(lip) plate_proj(size,coords,start,small);
 }
-plate(platesize,switch_loc,origin,SWITCH_SIZE,MX_LW,thickness, MX_TH);
+plate(platesize,switch_loc,origin);
 
 
